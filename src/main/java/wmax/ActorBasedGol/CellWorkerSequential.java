@@ -2,7 +2,7 @@ package wmax.ActorBasedGol;
 
 public class CellWorkerSequential {
 
-	public CellsCurrentState simulate(Simulate sim) {
+	public CellsCurrentState simulate(Simulate sim) throws InterruptedException {
 		int livingNeighbours = sim.roi[1][1] ? -1 : 0;
 		
 		for(int i = 0; i < 3; i++)
@@ -19,6 +19,7 @@ public class CellWorkerSequential {
 			isAlive = true;
 		
 		CellsCurrentState result = new CellsCurrentState(isAlive,sim.pos);
+		
 		return result;
 	}
 }
