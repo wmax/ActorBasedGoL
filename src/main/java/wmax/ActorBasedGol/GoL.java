@@ -76,15 +76,15 @@ public class GoL extends UntypedActor {
 			
 			if(nrOfSimulationsDone == size[0]*size[1]) {
 //				
-//				for(int i = 0; i < size[0]; i++) {
-//					for(int j = 0; j < size[1]; j++) {
-//						
-//						System.err.print(matrix[i][j] ? 'x' : ' ');
-//					}
-//					System.err.println(" ");
-//				}
-//				
-//				System.err.println("-------------------");
+				for(int i = 0; i < size[0]; i++) {
+					for(int j = 0; j < size[1]; j++) {
+						
+						System.err.print(matrix[i][j] ? 'x' : ' ');
+					}
+					System.err.println(" ");
+				}
+				
+				System.err.println("-------------------");
 				nrOfSimulationsDone = 0;
 				simulateNextStep();
 //				Thread.sleep(100);
@@ -95,7 +95,6 @@ public class GoL extends UntypedActor {
 				System.err.println("nr of routees: " + router.nrOfInstances());
 			}
 		}
-
 	}
 
 	private void randomize() {
