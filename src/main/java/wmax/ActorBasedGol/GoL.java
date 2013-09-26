@@ -3,6 +3,7 @@ package wmax.ActorBasedGol;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import wmax.ActorBasedGol.CellWorkerSequential;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
@@ -14,9 +15,9 @@ public class GoL extends UntypedActor {
 	
 	private boolean[][] matrix;
 	private int[] size = {30,80};
-	private double chance = 0.0;
+	private double chance = 0.5;
 
-	private int nrOfCellWorkers = 4;
+	private int nrOfCellWorkers = 99;
 	private int nrOfSimulationsDone = 0;
 	
 	private long timer, delta, avg;
@@ -33,8 +34,8 @@ public class GoL extends UntypedActor {
 	public GoL(boolean shouldRender, boolean shouldUseAkka, boolean benchMode) {
 		if(benchMode) {
 			delay = 0;
-			size[0] = 500;
-			size[1] = 500;
+			size[0] = 300;
+			size[1] = 300;
 		}
 		
 		render = shouldRender;
@@ -45,7 +46,7 @@ public class GoL extends UntypedActor {
 	public void preStart() throws IOException, InterruptedException {
 		matrix = new boolean[size[0]][size[1]];
 		randomize();
-		spawnGlider();
+//		spawnGlider();
 		router = new RoundRobinRouter(nrOfCellWorkers);
 		
 		if(useAkka) {
@@ -61,10 +62,7 @@ public class GoL extends UntypedActor {
 		matrix[3][2] = true;
 		matrix[3][3] = true;
 		matrix[2][3] = true;
-		matrix[1][2] = true;
-
-		// TODO Auto-generated method stub
-		
+		matrix[1][2] = true;		
 	}
 
 	public void simulateNextStepSecuential() throws IOException, InterruptedException {
@@ -128,11 +126,11 @@ public class GoL extends UntypedActor {
 		delta = System.currentTimeMillis() - timer;
 		steps += 1;
 		avg += delta;
-		System.err.println("last leap took: " + delta);
-		System.err.print("one leap took aprox.: " + avg/steps + "ms\t");
+		System.err.println("last leap took: " + delta + "ms");
+//		System.err.print("one leap took aprox.: " + avg/steps + "ms\t");
 
-		System.err.println(useAkka ? "nr of routees: " + router.nrOfInstances() : "\n");
-		Runtime.getRuntime().exec("clear");
+//		System.err.println(useAkka ? "nr of routees: " + router.nrOfInstances() : "\n");
+//		Runtime.getRuntime().exec("clear");
 	}
 
 	private void doRender() throws IOException {

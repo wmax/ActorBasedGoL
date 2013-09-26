@@ -34,7 +34,7 @@ public class BootstrapGoL {
 		
 		ActorSystem system = ActorSystem.create("GoL-System");
 //		system.actorOf(Props.create(GoL.class, shouldRender, useAkka, benchMode));
-		system.actorOf(Props.create(GoL.class, true, true, false));
+		system.actorOf(Props.create(GoL.class, false, true, true));
 
 	}
 }
