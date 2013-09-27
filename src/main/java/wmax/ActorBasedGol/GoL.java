@@ -11,13 +11,13 @@ import akka.routing.RoundRobinRouter;
 
 public class GoL extends UntypedActor {
 	
-	private ActorRef cells;
+	private ActorRef cells, lines;
 	
 	private boolean[][] matrix;
 	private int[] size = {30,80};
-	private double chance = 0.5;
+	private double chance = 0.33;
 
-	private int nrOfCellWorkers = 99;
+	private int nrOfCellWorkers = 4;
 	private int nrOfSimulationsDone = 0;
 	
 	private long timer, delta, avg;
@@ -50,7 +50,9 @@ public class GoL extends UntypedActor {
 		router = new RoundRobinRouter(nrOfCellWorkers);
 		
 		if(useAkka) {
-			cells = getContext().actorOf(Props.create(CellWorker.class).withRouter(router));
+//			cells = getContext().actorOf(Props.create(CellWorker.class).withRouter(router));
+			lines = getContext().actorOf(Props.create(LineWorker.class).withRouter(router));
+
 			simulateNextStep();
 		} else 
 			while(true)
@@ -92,11 +94,13 @@ public class GoL extends UntypedActor {
 		
 		timer = System.currentTimeMillis();
 
-		for(int i = 0; i < size[0]; i++)
-			for(int j = 0; j < size[1]; j++) {
-				int[] pos = {i,j};
-				cells.tell(new Simulate(getRoi(pos), copy[i][j], pos), getSelf());
-			}
+		for(int i = 0; i < size[0]; i++) {
+//			for(int j = 0; j < size[1]; j++) {
+//				int[] pos = {i,j};
+//				cells.tell(new Simulate(getRoi(pos), matrix[i][j], pos), getSelf());
+				lines.tell(new SimulateLine(copy, i, size), getSelf());
+//			}
+		}
 	}
 	
 	@Override
@@ -107,6 +111,7 @@ public class GoL extends UntypedActor {
 			nrOfSimulationsDone += 1;
 			
 			if(nrOfSimulationsDone == size[0]*size[1]) {
+
 				showStats(); // also measures end of the leap
 
 				//--- this section is for whatever should happen between the leaps
@@ -119,7 +124,25 @@ public class GoL extends UntypedActor {
 				
 				simulateNextStep(); // also measures start of the leap
 			}
-		}
+		} else if (msg instanceof LinesCurrentState) {
+			LinesCurrentState state = (LinesCurrentState)msg;
+			
+			matrix[state.lineNum] = state.line;
+			nrOfSimulationsDone += 1;
+			
+			if(nrOfSimulationsDone == size[0]) {
+				
+				showStats(); // also measures end of the leap
+
+				//--- this section is for whatever should happen between the leaps
+				doRender();
+				
+				Thread.sleep(delay);
+				nrOfSimulationsDone = 0;
+				
+				simulateNextStep();
+			}
+		} else { System.err.println("unhandled msg"); }
 	}
 
 	private void showStats() throws IOException {
@@ -127,10 +150,10 @@ public class GoL extends UntypedActor {
 		steps += 1;
 		avg += delta;
 		System.err.println("last leap took: " + delta + "ms");
-//		System.err.print("one leap took aprox.: " + avg/steps + "ms\t");
+		System.err.print("one leap took aprox.: " + avg/steps + "ms\t");
 
-//		System.err.println(useAkka ? "nr of routees: " + router.nrOfInstances() : "\n");
-//		Runtime.getRuntime().exec("clear");
+		System.err.println(useAkka ? "nr of routees: " + router.nrOfInstances() : "\n");
+		Runtime.getRuntime().exec("clear");
 	}
 
 	private void doRender() throws IOException {

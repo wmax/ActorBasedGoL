@@ -27,18 +27,6 @@ public class CellWorker extends UntypedActor {
 		if(livingNeighbours == 3)
 			isAlive = true;
 		
-//		//stupid wait
-//		for(long i = 0; i < 100; i++) {
-//			for(long j = 0; j < 100; j++) {
-//				for(long k = 0; k < 100; k++) {
-//
-//					long a = 0;
-//					a += i;
-//				}
-//			}
-//		}
-		
 		getSender().tell(new CellsCurrentState(isAlive,sim.pos), getSelf());
 	}
-
 }
